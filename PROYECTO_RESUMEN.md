@@ -15,13 +15,16 @@ FLAG{primer_contenedor_ABC12345}
 
 **Ahora (v2.0):**
 ```
-FLAG{12345678-1234-5678-1234-567890abcdef}
+12345678-1234-5678-1234-567890abcdef
 ```
+
+**⚠️ IMPORTANTE: Ya NO se usa el prefijo `FLAG{}`**
 
 - ✅ Generación con `uuid.uuid5(namespace, datos)`
 - ✅ Determinísticas: mismo estudiante = misma flag
 - ✅ Imposibles de adivinar
 - ✅ Formato estándar UUID
+- ✅ Los estudiantes copian y pegan el UUID directo
 
 **Implementación:** `docker_challenge.py` - función `generar_flag_personalizada()`
 
@@ -75,6 +78,12 @@ MQTT_PASSWORD=  # Opcional
 ### 4. 🖥️ Sistema de Monitoreo para Profesores
 
 **Ubicación:** `mqtt_monitor/`
+
+⚠️ **IMPORTANTE: Esta carpeta es SOLO para PROFESORES**
+
+**Separación de roles:**
+- 👨‍🎓 **ESTUDIANTES** → Dashboard principal (`templates/index.html` - puerto 5000)
+- 👨‍🏫 **PROFESORES** → Monitor MQTT (`mqtt_monitor/` - puerto 5001)
 
 **Archivos incluidos:**
 

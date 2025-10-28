@@ -12,11 +12,11 @@ Todas las características solicitadas han sido implementadas exitosamente:
 - [x] Persistencia de progreso en JSON
 - [x] CLI interactivo con menú
 
-### 2. 🔐 Flags UUID Personalizadas
-- [x] Cambiado de `FLAG{texto_HASH}` a formato UUID completo
-- [x] Implementación con `uuid.uuid5()` para determinismo
-- [x] Formato: `FLAG{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}`
-- [x] Únicas por estudiante pero reproducibles
+### 1. 🔐 **Flags UUID** ✅
+- Cambié el sistema de flags de hash simple a **UUID completo** usando `uuid.uuid5()`
+- Las flags ahora son **UUID directo SIN `FLAG{}`**: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+- Los estudiantes solo copian y pegan el UUID
+- Son **determinísticas** (mismo estudiante = misma flag) pero imposibles de adivinar
 
 ### 3. 🎨 Dashboard Estilo Hacker (HackTheBox)
 - [x] Tema oscuro completo (#0a0e27)
@@ -286,16 +286,20 @@ python3 verify_system.py
 
 | Servicio | URL | Descripción |
 |----------|-----|-------------|
-| **Dashboard Estudiante** | http://localhost:5000 | Interface principal CTF |
-| **Dashboard Profesor** | http://localhost:5001 | Monitor MQTT |
+| **👨‍🎓 Dashboard ESTUDIANTES** | http://localhost:5000 | Interface principal CTF - Resolver retos |
+| **👨‍🏫 Monitor PROFESORES** | http://localhost:5001 | Monitor MQTT - Ver progreso de todos |
 | **API REST** | http://localhost:5000/api/* | Endpoints del sistema |
+
+⚠️ **Importante:** 
+- Los **estudiantes** usan puerto **5000** (dashboard principal)
+- Los **profesores** usan puerto **5001** (sistema de monitoreo MQTT)
 
 ### Endpoints API
 
 ```
 GET  /api/progress              # Progreso del estudiante
 GET  /api/challenges            # Lista de retos
-POST /api/submit                # Enviar flag
+POST /api/submit                # Enviar flag (UUID directo, sin FLAG{})
 GET  /api/hint/{id}             # Obtener pista
 ```
 
@@ -307,8 +311,8 @@ GET  /api/hint/{id}             # Obtener pista
 1. ✅ Abrir http://localhost:5000
 2. ✅ Leer la descripción del Reto #1
 3. ✅ Ejecutar comandos Docker según instrucciones
-4. ✅ Copiar la flag del reto
-5. ✅ Enviar desde el dashboard
+4. ✅ Copiar el UUID del reto (sin FLAG{})
+5. ✅ Pegar directamente en el dashboard
 6. ✅ Continuar con el siguiente reto
 
 ### Para el Profesor:

@@ -17,6 +17,7 @@ import paho.mqtt.client as mqtt
 import json
 import time
 import random
+import uuid
 from datetime import datetime
 
 # Configuración
@@ -92,7 +93,7 @@ def send_flag_submit(client, documento, reto):
         "documento": documento,
         "reto_id": reto["id"],
         "reto_nombre": reto["nombre"],
-        "flag": f"FLAG{{{'x' * 32}}}",  # Simulated flag
+        "flag": f"{uuid.uuid4()}",  # UUID directo sin FLAG{}
         "puntos_ganados": reto["puntos"],
         "puntos_totales": puntos,
         "completados": len(completados),

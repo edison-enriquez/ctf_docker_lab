@@ -133,9 +133,24 @@ Reto: #1
 Flag: FLAG{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
 ```
 
-## 📡 Monitoreo MQTT (Profesores)
+## 📡 Monitoreo MQTT (Solo Profesores)
 
-El sistema incluye capacidad de monitoreo en tiempo real a través de MQTT. Los estudiantes publican automáticamente eventos de progreso que pueden ser monitoreados centralmente.
+### ⚠️ IMPORTANTE: Separación de Roles
+
+- **👨‍🎓 ESTUDIANTES**: Usan el dashboard principal en `http://localhost:5000`
+  - Interface hacker-style para resolver retos
+  - Envían códigos UUID directamente (sin `FLAG{}`)
+  - Ven su propio progreso individual
+
+- **👨‍🏫 PROFESORES**: Usan el monitor MQTT en `http://localhost:5001`
+  - Dashboard de monitoreo centralizado
+  - Ven el progreso de TODOS los estudiantes
+  - Reciben notificaciones en tiempo real
+  - Consultan estadísticas globales
+
+---
+
+El sistema incluye capacidad de monitoreo en tiempo real a través de MQTT. Los estudiantes publican automáticamente eventos de progreso que pueden ser monitoreados centralmente por el profesor.
 
 ### Para Profesores/Administradores
 
@@ -183,21 +198,22 @@ El dashboard principal ha sido rediseñado con inspiración en HackTheBox:
 
 ### Flags UUID
 
-Las flags ahora usan formato UUID completo en lugar de hash simple:
+Las flags ahora usan formato UUID completo y se envían **SIN el prefijo FLAG{}**:
 
-**Formato anterior:**
+**Lo que ves en el reto:**
 ```
-FLAG{primer_contenedor_ABC12345}
+12345678-1234-5678-1234-567890abcdef
 ```
 
-**Formato actual (UUID):**
+**Lo que copias y pegas:**
 ```
-FLAG{12345678-1234-5678-1234-567890abcdef}
+12345678-1234-5678-1234-567890abcdef
 ```
 
 - Generadas con `uuid.uuid5()` para determinismo
 - Únicas por estudiante y por reto
 - Imposibles de adivinar pero reproducibles
+- **NO necesitas escribir `FLAG{...}`, solo pega el UUID directo**
 
 ---
 

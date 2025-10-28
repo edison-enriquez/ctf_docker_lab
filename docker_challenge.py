@@ -277,11 +277,11 @@ class DockerChallenge:
             texto_base: Texto base de la flag (ej: "primer_contenedor")
             
         Returns:
-            Flag personalizada en formato UUID: FLAG{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
+            UUID directo (sin prefijo FLAG{}): xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
         """
         if not self.documento_estudiante:
             # UUID aleatorio si no hay documento
-            return f"FLAG{{{uuid.uuid4()}}}"
+            return str(uuid.uuid4())
         
         # Generar UUID determinístico basado en documento + reto
         # Usamos namespace UUID5 con SHA1
@@ -289,7 +289,7 @@ class DockerChallenge:
         datos = f"{self.documento_estudiante}_{reto_id}_{texto_base}"
         flag_uuid = uuid.uuid5(namespace, datos)
         
-        return f"FLAG{{{flag_uuid}}}"
+        return str(flag_uuid)
 
     def setup_environment(self) -> bool:
         """

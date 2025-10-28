@@ -1,4 +1,13 @@
-# 📡 MQTT Monitoring System - Especificaciones para Desarrollo
+# 📡 MQTT Monitoring System - Sistema de Monitoreo para PROFESORES
+
+## ⚠️ IMPORTANTE: Este módulo es SOLO para PROFESORES
+
+**Este directorio contiene el sistema de monitoreo para que el PROFESOR pueda visualizar el progreso de TODOS los estudiantes en tiempo real.**
+
+- ✅ **Para ESTUDIANTES**: Usar el dashboard principal en `http://localhost:5000`
+- ✅ **Para PROFESORES**: Usar este monitor MQTT en `http://localhost:5001`
+
+---
 
 ## 🎯 Objetivo
 
@@ -125,7 +134,7 @@ docker_ctf_lab/{documento}/flag_submit
   "documento": "1234567890",
   "reto_id": 5,
   "reto_nombre": "Conexión SSH entre contenedores",
-  "flag": "FLAG{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}",
+  "flag": "12345678-1234-5678-1234-567890abcdef",
   "puntos_ganados": 30,
   "puntos_totales": 120,
   "completados": 5,
@@ -135,6 +144,7 @@ docker_ctf_lab/{documento}/flag_submit
 
 **Descripción:**
 - Se envía cuando el estudiante completa un reto exitosamente
+- La flag es un UUID directo (sin prefijo FLAG{})
 - Incluye detalles del reto completado
 - Permite ver actividad en tiempo real
 
