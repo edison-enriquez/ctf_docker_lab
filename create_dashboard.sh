@@ -1,3 +1,5 @@
+#!/bin/bash
+cat > /workspaces/ctf_docker_lab/templates/index.html << 'EOF'
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -949,3 +951,4 @@
     </script>
 </body>
 </html>
+EOF

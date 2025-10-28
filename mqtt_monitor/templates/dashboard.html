@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📡 MQTT Monitor - Docker CTF Lab</title>
+    <style>
+        /* TODO: Implementar estilos completos según especificaciones */
+        /* Usar la misma paleta de colores que el dashboard principal */
+        
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1a1f3a;
+            --accent-green: #00ff41;
+            --accent-cyan: #00d9ff;
+            --accent-purple: #9d4edd;
+            --accent-red: #ff006e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --border-color: #00ff4144;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+        
+        h1 {
+            color: var(--accent-green);
+            text-shadow: 0 0 10px var(--accent-green);
+            letter-spacing: 2px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+        
+        .students-list {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .status-online {
+            color: var(--accent-green);
+        }
+        
+        .status-offline {
+            color: var(--accent-red);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 255, 65, 0.2);
+            border: 2px solid var(--accent-green);
+            color: var(--accent-green);
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(500px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📡 MQTT MONITORING DASHBOARD</h1>
+            <p style="color: var(--accent-cyan);">[ REAL-TIME STUDENT PROGRESS TRACKING ]</p>
+        </header>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalStudents">0</div>
+                <div style="color: var(--text-secondary);">TOTAL STUDENTS</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="onlineStudents">0</div>
+                <div style="color: var(--text-secondary);">ONLINE</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgProgress">0%</div>
+                <div style="color: var(--text-secondary);">AVG PROGRESS</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalEvents">0</div>
+                <div style="color: var(--text-secondary);">EVENTS</div>
+            </div>
+        </div>
+        
+        <div class="students-list">
+            <h2 style="color: var(--accent-purple); margin-bottom: 15px;">[ ACTIVE STUDENTS ]</h2>
+            <table id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>DOCUMENTO</th>
+                        <th>STATUS</th>
+                        <th>PROGRESS</th>
+                        <th>POINTS</th>
+                        <th>COMPLETED</th>
+                        <th>LAST SEEN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Datos cargados dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+    
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        // TODO: Implementar lógica completa del frontend
+        // - Conexión WebSocket
+        // - Actualización en tiempo real
+        // - Notificaciones
+        // - Gráficos
+        
+        const socket = io();
+        
+        socket.on('connect', () => {
+            console.log('✅ Conectado al servidor WebSocket');
+            loadData();
+        });
+        
+        socket.on('heartbeat', (data) => {
+            console.log('💓 Heartbeat recibido:', data);
+            updateStudent(data);
+        });
+        
+        socket.on('flag_submitted', (data) => {
+            console.log('🎯 Flag submitted:', data);
+            showNotification(`${data.documento} completó un reto!`);
+            updateStudent(data);
+        });
+        
+        socket.on('notification', (data) => {
+            showNotification(`${data.documento} completó ${data.reto} (+${data.puntos} pts)`);
+        });
+        
+        function loadData() {
+            // Cargar estudiantes
+            fetch('/api/students')
+                .then(res => res.json())
+                .then(students => {
+                    renderStudents(students);
+                });
+            
+            // Cargar estadísticas
+            fetch('/api/statistics')
+                .then(res => res.json())
+                .then(stats => {
+                    document.getElementById('totalStudents').textContent = stats.total_students;
+                    document.getElementById('onlineStudents').textContent = stats.online_students;
+                    document.getElementById('avgProgress').textContent = stats.avg_progress.toFixed(1) + '%';
+                    document.getElementById('totalEvents').textContent = stats.total_events;
+                });
+        }
+        
+        function renderStudents(students) {
+            const tbody = document.querySelector('#studentsTable tbody');
+            tbody.innerHTML = '';
+            
+            students.forEach(student => {
+                const row = document.createElement('tr');
+                const statusClass = student.status === 'online' ? 'status-online' : 'status-offline';
+                const statusIcon = student.status === 'online' ? '🟢' : '🔴';
+                
+                row.innerHTML = `
+                    <td>${student.documento}</td>
+                    <td class="${statusClass}">${statusIcon} ${student.status.toUpperCase()}</td>
+                    <td>${student.progreso_porcentaje || 0}%</td>
+                    <td>${student.puntos || 0}</td>
+                    <td>${student.completados || 0}</td>
+                    <td>${formatTime(student.last_seen)}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        function updateStudent(data) {
+            loadData(); // Recargar datos
+        }
+        
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+        
+        function formatTime(timestamp) {
+            if (!timestamp) return 'Never';
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+            
+            if (diff < 60) return `${diff}s ago`;
+            if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+            return date.toLocaleTimeString('es-ES');
+        }
+        
+        // Auto-refresh cada 5 segundos
+        setInterval(loadData, 5000);
+    </script>
+</body>
+</html>

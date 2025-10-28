@@ -11,9 +11,18 @@ import json
 import hashlib
 import docker
 import subprocess
+import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
+
+# MQTT (opcional - se instala si está disponible)
+try:
+    import paho.mqtt.client as mqtt
+    MQTT_AVAILABLE = True
+except ImportError:
+    MQTT_AVAILABLE = False
+    mqtt = None
 
 
 class DockerChallengeError(Exception):
@@ -43,6 +52,21 @@ class DockerChallenge:
         except Exception as e:
             print(f"⚠️  Advertencia: No se pudo conectar a Docker: {e}")
             self.docker_client = None
+        
+        # Configuración MQTT (configurable)
+        self.mqtt_config = {
+            "enabled": os.getenv("MQTT_ENABLED", "false").lower() == "true",
+            "broker": os.getenv("MQTT_BROKER", "broker.hivemq.com"),
+            "port": int(os.getenv("MQTT_PORT", "1883")),
+            "topic_base": os.getenv("MQTT_TOPIC", "docker_ctf_lab"),
+            "username": os.getenv("MQTT_USERNAME", ""),
+            "password": os.getenv("MQTT_PASSWORD", "")
+        }
+        
+        # Cliente MQTT
+        self.mqtt_client = None
+        if MQTT_AVAILABLE and self.mqtt_config["enabled"]:
+            self._init_mqtt()
         
         # Definir retos
         self.retos = [
@@ -246,23 +270,26 @@ class DockerChallenge:
 
     def generar_flag_personalizada(self, reto_id: int, texto_base: str) -> str:
         """
-        Genera una flag personalizada basada en el documento del estudiante.
+        Genera una flag personalizada en formato UUID basada en el documento del estudiante.
         
         Args:
             reto_id: ID del reto
             texto_base: Texto base de la flag (ej: "primer_contenedor")
             
         Returns:
-            Flag personalizada en formato FLAG{texto_base_HASH}
+            Flag personalizada en formato UUID: FLAG{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
         """
         if not self.documento_estudiante:
-            return f"FLAG{{{texto_base}}}"
+            # UUID aleatorio si no hay documento
+            return f"FLAG{{{uuid.uuid4()}}}"
         
-        # Generar hash único basado en documento + reto
+        # Generar UUID determinístico basado en documento + reto
+        # Usamos namespace UUID5 con SHA1
+        namespace = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')  # Namespace estándar
         datos = f"{self.documento_estudiante}_{reto_id}_{texto_base}"
-        hash_unico = hashlib.sha256(datos.encode()).hexdigest()[:8].upper()
+        flag_uuid = uuid.uuid5(namespace, datos)
         
-        return f"FLAG{{{texto_base}_{hash_unico}}}"
+        return f"FLAG{{{flag_uuid}}}"
 
     def setup_environment(self) -> bool:
         """
@@ -380,6 +407,15 @@ class DockerChallenge:
                 self.progress["puntos"] += reto["puntos"]
                 self.progress[f"reto_{reto_id}_fecha"] = datetime.now().isoformat()
                 self.save_progress()
+                
+                # Publicar en MQTT
+                self._publish_mqtt("flag_submit", {
+                    "reto_id": reto_id,
+                    "reto_nombre": reto["nombre"],
+                    "puntos": reto["puntos"],
+                    "total_puntos": self.progress["puntos"],
+                    "completados": len(self.progress["completados"])
+                })
                 
                 mensaje = (
                     "\n🎉 ¡CORRECTO! 🎉\n"
@@ -629,6 +665,84 @@ class DockerChallenge:
                 pass
         
         print(f"\n✅ Limpieza completada: {cleaned} contenedores eliminados\n")
+
+    def _init_mqtt(self) -> None:
+        """Inicializa el cliente MQTT"""
+        try:
+            self.mqtt_client = mqtt.Client(client_id=f"docker_ctf_{self.documento_estudiante or 'unknown'}")
+            
+            # Configurar credenciales si existen
+            if self.mqtt_config["username"]:
+                self.mqtt_client.username_pw_set(
+                    self.mqtt_config["username"],
+                    self.mqtt_config["password"]
+                )
+            
+            # Conectar
+            self.mqtt_client.connect(
+                self.mqtt_config["broker"],
+                self.mqtt_config["port"],
+                60
+            )
+            
+            # Iniciar loop en background
+            self.mqtt_client.loop_start()
+            
+            print(f"✅ MQTT conectado a {self.mqtt_config['broker']}")
+            
+        except Exception as e:
+            print(f"⚠️  Error conectando MQTT: {e}")
+            self.mqtt_client = None
+
+    def _publish_mqtt(self, event_type: str, data: dict) -> None:
+        """
+        Publica evento en MQTT
+        
+        Args:
+            event_type: Tipo de evento (progress, connection, flag_submit)
+            data: Datos del evento
+        """
+        if not self.mqtt_client or not self.mqtt_config["enabled"]:
+            return
+        
+        try:
+            topic = f"{self.mqtt_config['topic_base']}/{self.documento_estudiante}/{event_type}"
+            
+            payload = {
+                "timestamp": datetime.now().isoformat(),
+                "documento": self.documento_estudiante,
+                "event": event_type,
+                **data
+            }
+            
+            self.mqtt_client.publish(topic, json.dumps(payload), qos=1)
+            
+        except Exception as e:
+            print(f"⚠️  Error publicando MQTT: {e}")
+
+    def send_heartbeat(self) -> None:
+        """Envía heartbeat para indicar que el estudiante está activo"""
+        self._publish_mqtt("heartbeat", {
+            "status": "online",
+            "completados": len(self.progress.get("completados", [])),
+            "puntos": self.progress.get("puntos", 0)
+        })
+
+    def send_progress_report(self) -> None:
+        """Envía reporte completo de progreso via MQTT"""
+        self._publish_mqtt("progress", {
+            "completados": self.progress.get("completados", []),
+            "puntos": self.progress.get("puntos", 0),
+            "total_retos": len(self.retos),
+            "fecha_inicio": self.progress.get("fecha_inicio", ""),
+            "retos_detalle": [
+                {
+                    "id": reto_id,
+                    "fecha": self.progress.get(f"reto_{reto_id}_fecha", "")
+                }
+                for reto_id in self.progress.get("completados", [])
+            ]
+        })
 
 
 def main():
