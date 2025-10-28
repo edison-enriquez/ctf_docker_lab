@@ -1,22 +1,24 @@
 # 🐳 Docker CTF Lab - Sistema de Retos Capture The Flag
 
-> **Laboratorio interactivo estilo HackTheBox para aprendizaje de Docker con validación automática de flags personalizadas**
+> **Laboratorio interactivo estilo HackTheBox para aprendizaje de Docker con validación automática de flags UUID personalizadas**
 
 [![Docker](https://img.shields.io/badge/Docker-Requerido-2496ED?logo=docker)](https://www.docker.com/)
 [![Python](https://img.shields.io/badge/Python-3.8+-3776AB?logo=python)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-Dashboard-000000?logo=flask)](https://flask.palletsprojects.com/)
+[![MQTT](https://img.shields.io/badge/MQTT-Monitoring-purple?logo=mqtt)](https://mqtt.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ## 📋 Descripción
 
-**Docker CTF Lab** es un sistema de retos progresivos tipo "Capture The Flag" diseñado para aprender Docker de forma práctica e interactiva. Cada estudiante recibe **flags personalizadas** basadas en su documento de identidad, lo que garantiza la integridad académica y facilita el seguimiento del progreso individual.
+**Docker CTF Lab** es un sistema de retos progresivos tipo "Capture The Flag" diseñado para aprender Docker de forma práctica e interactiva. Cada estudiante recibe **flags UUID personalizadas** basadas en su documento de identidad, lo que garantiza la integridad académica y facilita el seguimiento del progreso individual.
 
 ### 🎯 Características Principales
 
 - ✅ **15 Retos Progresivos**: Desde comandos básicos hasta arquitecturas complejas
-- 🔒 **Flags Personalizadas**: Únicas por estudiante usando hash de documento
+- � **Flags UUID Personalizadas**: Únicas por estudiante usando UUID deterministico (uuid.uuid5)
 - 🤖 **Validación Automática**: Verifica contenedores, redes, volúmenes mediante Docker API
-- 📊 **Dashboard Web**: Interfaz visual para tracking de progreso
+- 🎨 **Dashboard Hacker-Style**: UI estilo HackTheBox con tema oscuro, efectos Matrix y glow verde neón
+- 📡 **Monitoreo MQTT en Tiempo Real**: Tracking de progreso de estudiantes vía MQTT broker
 - 🚀 **Auto-configuración**: Setup automático en GitHub Codespaces
 - 🏆 **Sistema de Puntos**: 380 puntos totales distribuidos por dificultad
 
@@ -128,20 +130,99 @@ Cada estudiante recibe flags únicas basadas en su documento de identidad median
 ```
 Documento: 1234567890
 Reto: #1
-Flag: FLAG{primer_contenedor_ABC12345}
+Flag: FLAG{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
 ```
+
+## 📡 Monitoreo MQTT (Profesores)
+
+El sistema incluye capacidad de monitoreo en tiempo real a través de MQTT. Los estudiantes publican automáticamente eventos de progreso que pueden ser monitoreados centralmente.
+
+### Para Profesores/Administradores
+
+Consulta la carpeta [`mqtt_monitor/`](mqtt_monitor/) que incluye:
+
+- 📖 **README completo** con especificaciones técnicas
+- 🚀 **QUICKSTART.md** para iniciar rápidamente
+- 🖥️ **app.py** - Servidor de monitoreo con Flask + SocketIO
+- 📊 **dashboard.html** - Plantilla para visualización en tiempo real
+- 🧪 **mqtt_test_publisher.py** - Generador de datos de prueba
+- ⚙️ **.env.example** - Configuración de variables de entorno
+
+**Eventos MQTT publicados automáticamente:**
+
+- `docker_ctf_lab/{documento}/heartbeat` - Estado online cada 30 segundos
+- `docker_ctf_lab/{documento}/progress` - Reporte completo de progreso
+- `docker_ctf_lab/{documento}/flag_submit` - Notificación de reto completado
+
+### Características del Monitor
+
+- ✅ Vista en tiempo real de todos los estudiantes
+- ✅ Estado online/offline automático
+- ✅ Notificaciones cuando completan retos
+- ✅ Estadísticas globales y rankings
+- ✅ Historial de eventos
+- ✅ Dashboard estilo hacker (consistente con el lab)
+
+**Más información:** [mqtt_monitor/README.md](mqtt_monitor/README.md)
+
+---
+
+## 🎨 Características de la UI
+
+### Diseño Hacker-Style
+
+El dashboard principal ha sido rediseñado con inspiración en HackTheBox:
+
+- **Tema oscuro** con colores neón (#00ff41, #00d9ff)
+- **Fuentes monoespaciadas** (Fira Code, Share Tech Mono)
+- **Efecto Matrix** de fondo con lluvia de caracteres
+- **Glow effects** en bordes y textos
+- **Animaciones** de escaneo y shimmer
+- **Terminal-style** con indicadores de estado tipo CLI
+- **Notificaciones toast** con efectos de deslizamiento
+
+### Flags UUID
+
+Las flags ahora usan formato UUID completo en lugar de hash simple:
+
+**Formato anterior:**
+```
+FLAG{primer_contenedor_ABC12345}
+```
+
+**Formato actual (UUID):**
+```
+FLAG{12345678-1234-5678-1234-567890abcdef}
+```
+
+- Generadas con `uuid.uuid5()` para determinismo
+- Únicas por estudiante y por reto
+- Imposibles de adivinar pero reproducibles
+
+---
 
 ## 📚 Recursos
 
 - [TALLER.md](TALLER.md) - Write-ups y soluciones detalladas
 - [GUIA_PROFESOR.md](GUIA_PROFESOR.md) - Guía para instructores
+- [INICIO_RAPIDO.md](INICIO_RAPIDO.md) - Guía rápida para estudiantes
+- [mqtt_monitor/README.md](mqtt_monitor/README.md) - Sistema de monitoreo MQTT
 - [Documentación Docker](https://docs.docker.com/)
 
-## 👨‍💻 Autor
+## �️ Tecnologías
+
+- **Python 3.8+** - Core del sistema
+- **Flask** - API REST y dashboard web
+- **Docker Python SDK** - Verificación automática
+- **Paho-MQTT** - Cliente MQTT para monitoreo
+- **HTML5/CSS3/JavaScript** - Frontend con efectos avanzados
+- **WebSockets (SocketIO)** - Actualizaciones en tiempo real
+
+## �👨‍💻 Autor
 
 **Edison Enríquez**
 - GitHub: [@edison-enriquez](https://github.com/edison-enriquez)
 
 ---
 
-**¿Listo para el desafío? 🐳**
+**¿Listo para el desafío? 🐳 Hack the containers!**
