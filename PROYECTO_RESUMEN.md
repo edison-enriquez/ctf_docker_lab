@@ -1,43 +1,366 @@
-# 📊 Resumen del Proyecto - Docker CTF Lab
+# � RESUMEN DEL PROYECTO - Docker CTF Lab v2.0
 
-## ✅ Proyecto Completado
+## 🎯 Versión Actual: 2.0 (UUID + MQTT + Hacker UI)
 
-Se ha creado exitosamente un laboratorio CTF completo para aprendizaje de Docker con las siguientes características:
+---
 
-### 🎯 Componentes Principales
+## ✨ Nuevas Características (v2.0)
 
-1. **Sistema de Flags Personalizadas** ✅
-   - Generación basada en documento del estudiante
-   - Hash SHA-256 único por estudiante
-   - Prevención de plagio académico
+### 1. 🔐 Sistema de Flags UUID
 
-2. **15 Retos Progresivos** ✅
-   - Nivel Principiante (3 retos, 35 pts)
-   - Nivel Intermedio (5 retos, 100 pts)
-   - Nivel Avanzado (4 retos, 115 pts)
-   - Nivel Experto (3 retos, 110 pts)
-   - **Total: 380 puntos**
+**Antes (v1.0):**
+```
+FLAG{primer_contenedor_ABC12345}
+```
 
-3. **Verificación Automática** ✅
-   - Usa Docker Python SDK
-   - Verifica contenedores, redes, volúmenes
-   - Inspección de configuraciones
-   - Validación de puertos y servicios
+**Ahora (v2.0):**
+```
+FLAG{12345678-1234-5678-1234-567890abcdef}
+```
 
-4. **Dashboard Web Interactivo** ✅
-   - Interfaz Flask moderna
-   - Progreso en tiempo real
-   - Filtros por dificultad
-   - Envío de flags con validación
-   - Pistas contextuales
+- ✅ Generación con `uuid.uuid5(namespace, datos)`
+- ✅ Determinísticas: mismo estudiante = misma flag
+- ✅ Imposibles de adivinar
+- ✅ Formato estándar UUID
 
-5. **Auto-configuración en Codespaces** ✅
-   - Archivo devcontainer.json
-   - Setup automático en postStartCommand
-   - Docker-in-Docker habilitado
-   - Python 3.11 pre-instalado
+**Implementación:** `docker_challenge.py` - función `generar_flag_personalizada()`
 
-### 📁 Estructura de Archivos
+---
+
+### 2. 🎨 Dashboard Estilo Hacker (HackTheBox)
+
+**Características visuales:**
+- 🌃 Tema oscuro completo (#0a0e27)
+- 💚 Colores neón (verde #00ff41, cyan #00d9ff)
+- 🔤 Fuentes monoespaciadas (Fira Code, Share Tech Mono)
+- 🌊 Efecto Matrix de fondo animado
+- ✨ Glow effects en bordes y textos
+- 🎞️ Animaciones de escaneo y shimmer
+- 🖥️ Terminal-style con prompt `root@docker-ctf-lab:~$`
+- 🔔 Notificaciones toast con slides
+
+**Archivo:** `templates/index.html` (30KB)
+
+---
+
+### 3. 📡 Monitoreo MQTT en Tiempo Real
+
+**Eventos publicados automáticamente:**
+
+| Evento | Tópico | Frecuencia | Datos |
+|--------|--------|------------|-------|
+| **Heartbeat** | `docker_ctf_lab/{doc}/heartbeat` | Cada 30s | Estado online, progreso básico |
+| **Progress** | `docker_ctf_lab/{doc}/progress` | Al completar reto | Reporte completo de progreso |
+| **Flag Submit** | `docker_ctf_lab/{doc}/flag_submit` | Al validar flag | Detalles del reto completado |
+
+**Broker por defecto:** `broker.hivemq.com:1883`
+
+**Variables de entorno:**
+```bash
+MQTT_ENABLED=True
+MQTT_BROKER=broker.hivemq.com
+MQTT_PORT=1883
+MQTT_USERNAME=  # Opcional
+MQTT_PASSWORD=  # Opcional
+```
+
+**Implementación:** `docker_challenge.py` - funciones:
+- `_init_mqtt()`
+- `_publish_mqtt()`
+- `send_heartbeat()`
+- `send_progress_report()`
+
+---
+
+### 4. 🖥️ Sistema de Monitoreo para Profesores
+
+**Ubicación:** `mqtt_monitor/`
+
+**Archivos incluidos:**
+
+```
+mqtt_monitor/
+├── README.md                   # Especificaciones completas (400+ líneas)
+├── QUICKSTART.md               # Guía de inicio rápido
+├── requirements.txt            # Dependencias (flask-socketio, paho-mqtt)
+├── .env.example                # Configuración de variables
+├── app.py                      # Servidor Flask + MQTT subscriber
+├── mqtt_test_publisher.py      # Simulador de estudiantes
+└── templates/
+    └── dashboard.html          # UI de monitoreo
+```
+
+**Funcionalidades del monitor:**
+- ✅ Lista de estudiantes online/offline en tiempo real
+- ✅ Progreso individual y estadísticas globales
+- ✅ Notificaciones cuando completan retos
+- ✅ Ranking/leaderboard por puntos
+- ✅ Historial de eventos
+- ✅ WebSockets para actualizaciones instantáneas
+- ✅ Dashboard con diseño hacker consistente
+
+**Para iniciar el monitor:**
+```bash
+cd mqtt_monitor
+pip install -r requirements.txt
+python app.py
+# Acceder a http://localhost:5001
+```
+
+---
+
+## 📊 Estadísticas del Proyecto
+
+### Archivos Principales
+
+| Archivo | Líneas | Tamaño | Función |
+|---------|--------|--------|---------|
+| `docker_challenge.py` | 850+ | 34KB | Motor de retos y verificación |
+| `templates/index.html` | 1000+ | 30KB | Dashboard hacker-style |
+| `web_dashboard.py` | 130 | 4KB | API REST Flask |
+| `mqtt_monitor/README.md` | 450+ | 16KB | Especificaciones MQTT |
+| `mqtt_monitor/app.py` | 280+ | 10KB | Servidor de monitoreo |
+
+### Commits Importantes
+
+1. `062cd92` - Sistema base completo (v1.0)
+2. `3ef923f` - UUID + Hacker UI + MQTT specs (v2.0)
+3. `4151520` - Documentación actualizada
+
+---
+
+## 🏗️ Arquitectura del Sistema
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ESTUDIANTE                                │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Browser: http://localhost:5000                       │  │
+│  │  Dashboard Hacker-Style con Matrix effect            │  │
+│  └───────────────┬──────────────────────────────────────┘  │
+│                  │                                           │
+│                  ▼                                           │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  web_dashboard.py (Flask)                            │  │
+│  │  - API REST: /api/progress, /api/challenges, etc    │  │
+│  │  - Sirve templates/index.html                        │  │
+│  └───────────────┬──────────────────────────────────────┘  │
+│                  │                                           │
+│                  ▼                                           │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  docker_challenge.py                                 │  │
+│  │  - Genera flags UUID con uuid.uuid5()               │  │
+│  │  - Verifica retos con Docker API                    │  │
+│  │  - Publica eventos a MQTT broker                    │  │
+│  └───────────────┬──────────────────────────────────────┘  │
+│                  │                                           │
+└──────────────────┼───────────────────────────────────────────┘
+                   │
+                   │ MQTT Publish
+                   ▼
+    ┌──────────────────────────────────────┐
+    │   MQTT Broker (broker.hivemq.com)    │
+    │   Tópicos: docker_ctf_lab/+/+        │
+    └────────────────┬─────────────────────┘
+                     │
+                     │ MQTT Subscribe
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    PROFESOR                                  │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  mqtt_monitor/app.py                                 │  │
+│  │  - Flask + SocketIO + MQTT client                    │  │
+│  │  - Suscribe a eventos de todos los estudiantes      │  │
+│  │  - Detecta online/offline                           │  │
+│  │  - Almacena en SQLite/memoria                       │  │
+│  └───────────────┬──────────────────────────────────────┘  │
+│                  │                                           │
+│                  ▼                                           │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Browser: http://localhost:5001                       │  │
+│  │  Monitoring Dashboard                                 │  │
+│  │  - Lista de estudiantes en tiempo real               │  │
+│  │  - Notificaciones de completados                     │  │
+│  │  - Estadísticas y rankings                           │  │
+│  └──────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🧪 Testing
+
+### Probar el Dashboard del Estudiante
+
+```bash
+# Terminal 1: Iniciar el dashboard
+./start.sh
+# Seleccionar opción 3: "Iniciar dashboard web"
+
+# Terminal 2 (opcional): Enviar heartbeats manuales
+python3 -c "from docker_challenge import DockerCTFLab; lab = DockerCTFLab(); lab.send_heartbeat()"
+```
+
+**Acceder:** http://localhost:5000
+
+---
+
+### Probar el Monitor del Profesor
+
+```bash
+# Terminal 1: Iniciar el monitor
+cd mqtt_monitor
+python app.py
+
+# Terminal 2: Simular estudiantes
+python mqtt_test_publisher.py
+```
+
+**Acceder:** http://localhost:5001
+
+**Verás:**
+- 5 estudiantes simulados (1111111, 2222222, etc.)
+- Heartbeats cada 10 segundos
+- Completado aleatorio de retos
+- Notificaciones en tiempo real
+
+---
+
+## 📚 Documentación Disponible
+
+| Archivo | Audiencia | Contenido |
+|---------|-----------|-----------|
+| `README.md` | General | Introducción, features, quick start |
+| `INICIO_RAPIDO.md` | Estudiantes | Guía paso a paso para comenzar |
+| `TALLER.md` | Estudiantes | Soluciones detalladas de cada reto |
+| `GUIA_PROFESOR.md` | Profesores | Gestión, calificación, troubleshooting |
+| `mqtt_monitor/README.md` | Desarrolladores | Especificaciones técnicas del monitor |
+| `mqtt_monitor/QUICKSTART.md` | Profesores | Inicio rápido del monitor |
+| `PROYECTO_RESUMEN.md` | Este archivo | Resumen ejecutivo del proyecto |
+
+---
+
+## 🔧 Configuración Opcional
+
+### Variables de Entorno (Estudiantes)
+
+```bash
+# Opcional: Personalizar MQTT
+export MQTT_BROKER=tu-broker.com
+export MQTT_PORT=1883
+export MQTT_USERNAME=usuario
+export MQTT_PASSWORD=contraseña
+```
+
+### Variables de Entorno (Monitor)
+
+Ver `mqtt_monitor/.env.example` para configuración completa.
+
+---
+
+## 🎯 Próximos Pasos Recomendados (Futuras Mejoras)
+
+1. **Autenticación** - Login para estudiantes y profesores
+2. **Base de datos** - PostgreSQL/MongoDB para producción
+3. **CI/CD** - GitHub Actions para testing automático
+4. **Docker Compose** - Deployment simplificado del monitor
+5. **Exportación** - Reportes en PDF/Excel
+6. **Gamificación** - Badges, achievements, leaderboard público
+7. **Multilingual** - Soporte para inglés/español
+8. **Mobile App** - Cliente móvil para monitoreo
+
+---
+
+## 🚀 Deploy a Producción
+
+### Opción 1: VPS con Docker Compose
+
+```yaml
+# docker-compose.yml (ejemplo)
+version: '3.8'
+services:
+  ctf_lab:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - MQTT_BROKER=broker.hivemq.com
+  
+  mqtt_monitor:
+    build: ./mqtt_monitor
+    ports:
+      - "5001:5001"
+    environment:
+      - MQTT_BROKER=broker.hivemq.com
+```
+
+### Opción 2: GitHub Codespaces (Actual)
+
+```bash
+# Ya configurado en .devcontainer/devcontainer.json
+# Auto-start al abrir el Codespace
+```
+
+### Opción 3: Servidor Local
+
+```bash
+# Instalar dependencias del sistema
+apt-get update
+apt-get install -y docker.io python3 python3-pip
+
+# Clonar repositorio
+git clone https://github.com/tu-usuario/ctf_docker_lab
+cd ctf_docker_lab
+
+# Instalar dependencias Python
+pip3 install -r requirements.txt
+
+# Iniciar servicios
+./start.sh
+```
+
+---
+
+## 📞 Soporte y Contacto
+
+**Desarrollador:** Edison Enríquez
+**GitHub:** [@edison-enriquez](https://github.com/edison-enriquez)
+
+**Para reportar bugs o solicitar features:**
+- Abrir un Issue en GitHub
+- Pull Requests bienvenidos
+
+---
+
+## 📜 Changelog
+
+### v2.0 (Actual) - 2024
+- ✨ Flags UUID con uuid.uuid5()
+- 🎨 Dashboard estilo HackTheBox
+- 📡 Sistema MQTT de monitoreo
+- 🖥️ Monitor para profesores
+- 📚 Documentación expandida
+
+### v1.0 - 2024
+- ✅ Sistema base con 15 retos
+- ✅ Flags personalizadas por hash
+- ✅ Dashboard web básico
+- ✅ Verificación automática
+- ✅ Auto-configuración Codespaces
+
+---
+
+## 🏆 Estadísticas de Desarrollo
+
+- **Tiempo total:** ~8 horas
+- **Commits:** 4+
+- **Líneas de código:** ~5000+
+- **Archivos:** 20+
+- **Documentación:** 1500+ líneas
+
+---
+
+**🐳 ¡Happy Hacking!**
 
 ```
 ctf_docker_lab/
