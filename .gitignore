@@ -1,26 +1,33 @@
+# Logs
+*.log
+/tmp/
+
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
+
+# Virtual environments
 venv/
-*.egg-info/
-dist/
-build/
+ENV/
+env/
 
 # IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
-# OS
-.DS_Store
-Thumbs.db
+# Progress files
+docker_ctf_progress_*.json
 
-# Proyecto específico
-.progress.json
-docker_lab/
+# Environment files with secrets
+.env
+
+# Archivos temporales del dashboard
+templates/*.backup
+templates/*.duplicado
+templates/*.problematic
+web_dashboard.log
