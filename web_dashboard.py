@@ -14,6 +14,26 @@ from docker_challenge import DockerChallenge
 app = Flask(__name__)
 challenge = DockerChallenge()
 
+# Mapeo de IDs de retos a textos base para generación de flags UUID
+# Debe coincidir exactamente con el usado en docker_challenge.py
+FLAG_BASES = {
+    1: "primer_contenedor",
+    2: "imagen_descargada",
+    3: "contenedor_background",
+    4: "puerto_mapeado",
+    5: "volumen_creado",
+    6: "red_creada",
+    7: "contenedores_conectados",
+    8: "ssh_configurado",
+    9: "telnet_activo",
+    10: "scada_desplegado",
+    11: "vnc_funcionando",
+    12: "dockerfile_creado",
+    13: "compose_desplegado",
+    14: "inspeccion_exitosa",
+    15: "limpieza_completa"
+}
+
 
 @app.route('/')
 def index():
@@ -86,7 +106,7 @@ def get_challenges():
         
         # Si el reto NO está completado, mostrar la flag para que pueda copiarla
         if not completado:
-            flag_personalizada = challenge.generar_flag_personalizada(reto["id"], reto["flag"])
+            flag_personalizada = challenge.generar_flag_personalizada(reto["id"], FLAG_BASES[reto["id"]])
             challenge_data["flag"] = flag_personalizada
         
         challenges_data.append(challenge_data)
@@ -286,8 +306,8 @@ def get_flags():
     
     for reto in challenge.retos:
         if reto["id"] in completados:
-            # Generar flag personalizada
-            flag_personalizada = challenge.generar_flag_personalizada(reto["id"], reto["flag"])
+            # Generar flag personalizada usando el texto base correcto
+            flag_personalizada = challenge.generar_flag_personalizada(reto["id"], FLAG_BASES[reto["id"]])
             flags_data.append({
                 "id": reto["id"],
                 "nombre": reto["nombre"],
@@ -302,6 +322,38 @@ def get_flags():
         "flags": flags_data,
         "puntos_totales": challenge.progress.get("puntos", 0)
     })
+
+
+@app.route('/api/writeup')
+def get_writeup():
+    """
+    Endpoint para obtener el contenido del taller/write-up en formato Markdown
+    
+    Returns:
+        JSON con el contenido del archivo TALLER.md
+    """
+    try:
+        import os
+        writeup_path = os.path.join(os.path.dirname(__file__), 'TALLER.md')
+        
+        with open(writeup_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        return jsonify({
+            "success": True,
+            "content": content,
+            "title": "🐳 Taller Docker CTF Lab - Write-ups y Soluciones"
+        })
+    except FileNotFoundError:
+        return jsonify({
+            "success": False,
+            "message": "❌ Archivo de write-up no encontrado"
+        }), 404
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": f"❌ Error al cargar write-up: {str(e)}"
+        }), 500
 
 
 if __name__ == '__main__':
