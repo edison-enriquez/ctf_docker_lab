@@ -18,6 +18,25 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/test')
+def test():
+    """Página de prueba para debugging"""
+    return render_template('test_challenges.html')
+
+
+@app.route('/api/debug')
+def debug_info():
+    """Endpoint de diagnóstico"""
+    return jsonify({
+        "status": "OK",
+        "documento_estudiante": challenge.documento_estudiante,
+        "total_retos": len(challenge.retos),
+        "retos_ids": [r["id"] for r in challenge.retos],
+        "completados": challenge.progress.get("completados", []),
+        "puntos": challenge.progress.get("puntos", 0)
+    })
+
+
 @app.route('/api/progress')
 def get_progress():
     """
@@ -42,18 +61,14 @@ def get_challenges():
     Endpoint para obtener todos los retos
     
     Returns:
-        JSON con lista de retos
+        JSON con lista de retos (incluye flag si está completado)
     """
     challenges_data = []
     
     for reto in challenge.retos:
         completado = reto["id"] in challenge.progress.get("completados", [])
         
-        # Generar la flag personalizada
-        flag_base = reto["flag"].split("{")[1].split("}")[0]
-        flag_personalizada = challenge.generar_flag_personalizada(reto["id"], flag_base)
-        
-        challenges_data.append({
+        challenge_data = {
             "id": reto["id"],
             "nombre": reto["nombre"],
             "descripcion": reto["descripcion"],
@@ -62,9 +77,16 @@ def get_challenges():
             "dificultad": reto["dificultad"],
             "categoria": reto["categoria"],
             "completado": completado,
-            "flag": flag_personalizada if not completado else None,
-            "fecha_completado": challenge.progress.get(f"reto_{reto['id']}_fecha", "") if completado else None
-        })
+            "fecha_completado": challenge.progress.get(f"reto_{reto['id']}_fecha", "") if completado else None,
+            "preguntas": reto.get("preguntas", [])
+        }
+        
+        # Si el reto NO está completado, mostrar la flag para que pueda copiarla
+        if not completado:
+            flag_personalizada = challenge.generar_flag_personalizada(reto["id"], reto["flag"])
+            challenge_data["flag"] = flag_personalizada
+        
+        challenges_data.append(challenge_data)
     
     return jsonify(challenges_data)
 
@@ -134,6 +156,38 @@ def get_hint(reto_id):
         "reto_id": reto_id,
         "nombre": reto["nombre"],
         "pista": reto["pista"]
+    })
+
+
+@app.route('/api/flags')
+def get_flags():
+    """
+    Endpoint para obtener las flags de los retos completados
+    Simula el comando: python3 docker_challenge.py start
+    
+    Returns:
+        JSON con las flags generadas para el estudiante
+    """
+    flags_data = []
+    completados = challenge.progress.get("completados", [])
+    
+    for reto in challenge.retos:
+        if reto["id"] in completados:
+            # Generar flag personalizada
+            flag_personalizada = challenge.generar_flag_personalizada(reto["id"], reto["flag"])
+            flags_data.append({
+                "id": reto["id"],
+                "nombre": reto["nombre"],
+                "flag": flag_personalizada,
+                "puntos": reto["puntos"]
+            })
+    
+    return jsonify({
+        "success": True,
+        "documento": challenge.documento_estudiante,
+        "total_completados": len(completados),
+        "flags": flags_data,
+        "puntos_totales": challenge.progress.get("puntos", 0)
     })
 
 

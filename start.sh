@@ -92,8 +92,28 @@ else
     echo -e "${GREEN}✅ Laboratorio ya configurado${NC}"
 fi
 
-# Menú principal
-while true; do
+# Si se ejecuta en modo no interactivo o con argumento "start" iniciamos los servicios mínimos para estudiante
+if [[ "$1" == "start" || "$1" == "" ]]; then
+    echo -e "\n${GREEN}🚀 Modo estudiante: iniciando servicios mínimos...${NC}"
+    # Verificar puerto 5000
+    if lsof -Pi :5000 -sTCP:LISTEN -t >/dev/null 2>&1; then
+        echo -e "${YELLOW}ℹ️  Puerto 5000 ya en uso, suponiendo que el dashboard está corriendo${NC}"
+    else
+        echo -e "${CYAN}🌐 Iniciando Dashboard Web en background...${NC}"
+        nohup python3 web_dashboard.py > /tmp/ctf_dashboard.log 2>&1 &
+        DASH_PID=$!
+        echo -e "${GREEN}✅ Dashboard iniciado (PID: ${DASH_PID}) - http://localhost:5000${NC}"
+        sleep 2
+    fi
+
+    echo -e "\n${CYAN}📌 Nota: Este modo inicia únicamente los servicios necesarios para estudiantes (dashboard web).${NC}"
+    echo -e "Si necesitas el menú interactivo ejecuta: ./start.sh menu${NC}\n"
+    exit 0
+fi
+
+# Menú principal (solo si se pasa 'menu' o 'interactive')
+if [[ "$1" == "menu" || "$1" == "interactive" ]]; then
+    while true; do
     echo -e "\n${GREEN}======================================================================"
     echo "   📋 MENÚ PRINCIPAL - Docker CTF Lab"
     echo "======================================================================${NC}"

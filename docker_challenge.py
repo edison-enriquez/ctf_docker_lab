@@ -78,7 +78,17 @@ class DockerChallenge:
                 "flag": "FLAG{primer_contenedor}",
                 "puntos": 10,
                 "dificultad": "Principiante",
-                "categoria": "Comandos Básicos"
+                "categoria": "Comandos Básicos",
+                "preguntas": [
+                    {
+                        "pregunta": "El comando básico para ejecutar un contenedor es 'docker ***'",
+                        "respuesta": "run"
+                    },
+                    {
+                        "pregunta": "Cuando ejecutas 'docker run', Docker primero *** la imagen si no está disponible localmente",
+                        "respuesta": "descarga"
+                    }
+                ]
             },
             {
                 "id": 2,
@@ -88,7 +98,17 @@ class DockerChallenge:
                 "flag": "FLAG{imagen_descargada}",
                 "puntos": 10,
                 "dificultad": "Principiante",
-                "categoria": "Imágenes"
+                "categoria": "Imágenes",
+                "preguntas": [
+                    {
+                        "pregunta": "El comando para descargar una imagen sin ejecutarla es 'docker ***'",
+                        "respuesta": "pull"
+                    },
+                    {
+                        "pregunta": "Para ver todas las imágenes descargadas localmente usas 'docker ***'",
+                        "respuesta": "images"
+                    }
+                ]
             },
             {
                 "id": 3,
@@ -98,7 +118,17 @@ class DockerChallenge:
                 "flag": "FLAG{contenedor_background}",
                 "puntos": 15,
                 "dificultad": "Principiante",
-                "categoria": "Ejecución"
+                "categoria": "Ejecución",
+                "preguntas": [
+                    {
+                        "pregunta": "La opción '***' (detached) ejecuta el contenedor en segundo plano",
+                        "respuesta": "-d"
+                    },
+                    {
+                        "pregunta": "Para asignar un nombre personalizado al contenedor usas la opción '*** nombre'",
+                        "respuesta": "--name"
+                    }
+                ]
             },
             {
                 "id": 4,
@@ -108,7 +138,17 @@ class DockerChallenge:
                 "flag": "FLAG{puerto_mapeado}",
                 "puntos": 15,
                 "dificultad": "Intermedio",
-                "categoria": "Redes"
+                "categoria": "Redes",
+                "preguntas": [
+                    {
+                        "pregunta": "La opción '***' se usa para mapear puertos del host al contenedor",
+                        "respuesta": "-p"
+                    },
+                    {
+                        "pregunta": "En el mapeo '8080:80', el puerto *** es del host y el 80 es del contenedor",
+                        "respuesta": "8080"
+                    }
+                ]
             },
             {
                 "id": 5,
@@ -118,7 +158,17 @@ class DockerChallenge:
                 "flag": "FLAG{volumen_creado}",
                 "puntos": 20,
                 "dificultad": "Intermedio",
-                "categoria": "Volúmenes"
+                "categoria": "Volúmenes",
+                "preguntas": [
+                    {
+                        "pregunta": "Los volúmenes en Docker permiten persistir *** incluso cuando el contenedor se elimina",
+                        "respuesta": "datos"
+                    },
+                    {
+                        "pregunta": "Para crear un volumen usas el comando 'docker volume ***'",
+                        "respuesta": "create"
+                    }
+                ]
             },
             {
                 "id": 6,
@@ -128,7 +178,17 @@ class DockerChallenge:
                 "flag": "FLAG{red_creada}",
                 "puntos": 20,
                 "dificultad": "Intermedio",
-                "categoria": "Redes"
+                "categoria": "Redes",
+                "preguntas": [
+                    {
+                        "pregunta": "El comando 'docker *** create' se usa para crear redes personalizadas",
+                        "respuesta": "network"
+                    },
+                    {
+                        "pregunta": "El driver de red más común que conecta contenedores en el mismo host es '***'",
+                        "respuesta": "bridge"
+                    }
+                ]
             },
             {
                 "id": 7,
@@ -138,7 +198,17 @@ class DockerChallenge:
                 "flag": "FLAG{contenedores_conectados}",
                 "puntos": 25,
                 "dificultad": "Avanzado",
-                "categoria": "Redes"
+                "categoria": "Redes",
+                "preguntas": [
+                    {
+                        "pregunta": "Para conectar un contenedor a una red específica usas la opción '*** red_nombre'",
+                        "respuesta": "--network"
+                    },
+                    {
+                        "pregunta": "Los contenedores en la misma red pueden comunicarse usando sus *** como hostname",
+                        "respuesta": "nombres"
+                    }
+                ]
             },
             {
                 "id": 8,
@@ -148,7 +218,17 @@ class DockerChallenge:
                 "flag": "FLAG{ssh_configurado}",
                 "puntos": 30,
                 "dificultad": "Avanzado",
-                "categoria": "Servicios"
+                "categoria": "Servicios",
+                "preguntas": [
+                    {
+                        "pregunta": "SSH es un protocolo de acceso *** que cifra la comunicación entre cliente y servidor",
+                        "respuesta": "remoto"
+                    },
+                    {
+                        "pregunta": "El puerto estándar de SSH es el ***, pero puedes usar cualquier puerto disponible",
+                        "respuesta": "22"
+                    }
+                ]
             },
             {
                 "id": 9,
@@ -158,7 +238,17 @@ class DockerChallenge:
                 "flag": "FLAG{telnet_activo}",
                 "puntos": 30,
                 "dificultad": "Avanzado",
-                "categoria": "Servicios"
+                "categoria": "Servicios",
+                "preguntas": [
+                    {
+                        "pregunta": "Telnet es un protocolo NO *** que envía datos en texto plano",
+                        "respuesta": "cifrado"
+                    },
+                    {
+                        "pregunta": "El puerto estándar de Telnet es el ***",
+                        "respuesta": "23"
+                    }
+                ]
             },
             {
                 "id": 10,
@@ -168,7 +258,17 @@ class DockerChallenge:
                 "flag": "FLAG{scada_desplegado}",
                 "puntos": 35,
                 "dificultad": "Experto",
-                "categoria": "Aplicaciones"
+                "categoria": "Aplicaciones",
+                "preguntas": [
+                    {
+                        "pregunta": "SCADA significa Supervisory Control and Data ***",
+                        "respuesta": "Acquisition"
+                    },
+                    {
+                        "pregunta": "Los sistemas SCADA se usan principalmente en entornos ***",
+                        "respuesta": "industriales"
+                    }
+                ]
             },
             {
                 "id": 11,
@@ -178,7 +278,17 @@ class DockerChallenge:
                 "flag": "FLAG{vnc_funcionando}",
                 "puntos": 35,
                 "dificultad": "Experto",
-                "categoria": "Aplicaciones"
+                "categoria": "Aplicaciones",
+                "preguntas": [
+                    {
+                        "pregunta": "VNC significa Virtual Network ***",
+                        "respuesta": "Computing"
+                    },
+                    {
+                        "pregunta": "VNC permite acceder a un escritorio *** de forma remota",
+                        "respuesta": "gráfico"
+                    }
+                ]
             },
             {
                 "id": 12,
@@ -188,7 +298,17 @@ class DockerChallenge:
                 "flag": "FLAG{dockerfile_creado}",
                 "puntos": 30,
                 "dificultad": "Avanzado",
-                "categoria": "Construcción"
+                "categoria": "Construcción",
+                "preguntas": [
+                    {
+                        "pregunta": "Un Dockerfile contiene las *** para construir una imagen de Docker",
+                        "respuesta": "instrucciones"
+                    },
+                    {
+                        "pregunta": "El comando 'docker ***' se usa para construir una imagen desde un Dockerfile",
+                        "respuesta": "build"
+                    }
+                ]
             },
             {
                 "id": 13,
@@ -198,7 +318,17 @@ class DockerChallenge:
                 "flag": "FLAG{compose_desplegado}",
                 "puntos": 40,
                 "dificultad": "Experto",
-                "categoria": "Orquestación"
+                "categoria": "Orquestación",
+                "preguntas": [
+                    {
+                        "pregunta": "Docker Compose permite definir aplicaciones con *** servicios en un solo archivo",
+                        "respuesta": "múltiples"
+                    },
+                    {
+                        "pregunta": "El archivo de configuración de Docker Compose se llama docker-compose.***",
+                        "respuesta": "yml"
+                    }
+                ]
             },
             {
                 "id": 14,
@@ -208,17 +338,37 @@ class DockerChallenge:
                 "flag": "FLAG{inspeccion_exitosa}",
                 "puntos": 25,
                 "dificultad": "Intermedio",
-                "categoria": "Diagnóstico"
+                "categoria": "Diagnóstico",
+                "preguntas": [
+                    {
+                        "pregunta": "El comando 'docker ***' muestra información detallada de un contenedor en formato JSON",
+                        "respuesta": "inspect"
+                    },
+                    {
+                        "pregunta": "La dirección IP interna de un contenedor se encuentra en NetworkSettings.***",
+                        "respuesta": "IPAddress"
+                    }
+                ]
             },
             {
                 "id": 15,
                 "nombre": "🧹 Limpieza Maestra",
-                "descripcion": "Limpia todos los contenedores detenidos, imágenes sin usar y volúmenes no utilizados",
-                "pista": "Usa 'docker system prune -a --volumes' con cuidado",
+                "descripcion": "Elimina todos los contenedores detenidos, todas las imágenes sin usar y todos los volúmenes huérfanos",
+                "pista": "Usa 'docker container prune', 'docker image prune -a', 'docker volume prune'",
                 "flag": "FLAG{limpieza_completa}",
                 "puntos": 20,
-                "dificultad": "Intermedio",
-                "categoria": "Mantenimiento"
+                "dificultad": "Básico",
+                "categoria": "Mantenimiento",
+                "preguntas": [
+                    {
+                        "pregunta": "El comando 'docker system ***' elimina todos los recursos no utilizados de Docker",
+                        "respuesta": "prune"
+                    },
+                    {
+                        "pregunta": "Los volúmenes huérfanos son aquellos que no están asociados a ningún ***",
+                        "respuesta": "contenedor"
+                    }
+                ]
             }
         ]
 
