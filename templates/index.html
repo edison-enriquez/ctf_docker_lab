@@ -572,6 +572,12 @@
             color: #ffd60a;
         }
 
+        .notification.info {
+            background: rgba(0, 217, 255, 0.2);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
         /* Modal */
         .modal {
             display: none;
@@ -1016,6 +1022,28 @@
             }
 
             try {
+                // PASO 1: Verificar requisitos Docker primero
+                showNotification('[ VERIFYING ] Verificando ejecución del comando Docker...', 'info');
+                
+                const verifyResponse = await fetch('/api/verify-flag', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ flag })
+                });
+
+                const verifyResult = await verifyResponse.json();
+
+                // Si la verificación Docker falla, mostrar error y detener
+                if (!verifyResult.success) {
+                    showNotification(`[ VERIFICATION FAILED ] ${verifyResult.message}`, 'error');
+                    return;
+                }
+
+                // PASO 2: Si la verificación fue exitosa, enviar la flag
+                showNotification('[ SUBMITTING ] Enviando flag...', 'info');
+                
                 const response = await fetch('/api/submit', {
                     method: 'POST',
                     headers: {
