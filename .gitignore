@@ -31,3 +31,13 @@ templates/*.backup
 templates/*.duplicado
 templates/*.problematic
 web_dashboard.log
+
+# Deployment package (no sincronizar)
+deployment_profesor/
+deployment_profesor.tar.gz
+*.tar.gz
+
+# Backups
+backups/
+*.sql
+*.sql.gz
