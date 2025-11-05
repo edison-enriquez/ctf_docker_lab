@@ -55,12 +55,12 @@ class DockerChallenge:
         
         # Configuración MQTT (configurable)
         self.mqtt_config = {
-            "enabled": os.getenv("MQTT_ENABLED", "false").lower() == "true",
-            "broker": os.getenv("MQTT_BROKER", "broker.hivemq.com"),
+            "enabled": os.getenv("MQTT_ENABLED", "true").lower() == "true",
+            "broker": os.getenv("MQTT_BROKER", "cygnus.uniajc.edu.co"),
             "port": int(os.getenv("MQTT_PORT", "1883")),
             "topic_base": os.getenv("MQTT_TOPIC", "docker_ctf_lab"),
-            "username": os.getenv("MQTT_USERNAME", ""),
-            "password": os.getenv("MQTT_PASSWORD", "")
+            "username": os.getenv("MQTT_USERNAME", "aiot"),
+            "password": os.getenv("MQTT_PASSWORD", "aiot123")
         }
         
         # Cliente MQTT

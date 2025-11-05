@@ -35,8 +35,10 @@ services:
       DATABASE_URL: postgresql://monitor_user:monitor_pass_2024@postgres:5432/ctf_monitor
       
       # MQTT Configuration
-      MQTT_BROKER: broker.hivemq.com
+      MQTT_BROKER: cygnus.uniajc.edu.co
       MQTT_PORT: 1883
+      MQTT_USERNAME: aiot
+      MQTT_PASSWORD: aiot123
       MQTT_TOPIC: docker_ctf_lab/+/+
       
       # Flask Configuration

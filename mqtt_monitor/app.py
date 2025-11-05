@@ -26,8 +26,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Configuración
-MQTT_BROKER = os.getenv('MQTT_BROKER', 'broker.hivemq.com')
+MQTT_BROKER = os.getenv('MQTT_BROKER', 'cygnus.uniajc.edu.co')
 MQTT_PORT = int(os.getenv('MQTT_PORT', 1883))
+MQTT_USERNAME = os.getenv('MQTT_USERNAME', 'aiot')
+MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', 'aiot123')
 MQTT_TOPIC = os.getenv('MQTT_TOPIC', 'docker_ctf_lab/+/+')
 HEARTBEAT_TIMEOUT = int(os.getenv('HEARTBEAT_TIMEOUT', 90))
 PORT = int(os.getenv('PORT', 5001))
@@ -458,6 +460,10 @@ if __name__ == '__main__':
     # Conectar a MQTT
     try:
         logger.info("🚀 Cliente MQTT iniciado")
+        # Configurar credenciales si están disponibles
+        if MQTT_USERNAME and MQTT_PASSWORD:
+            mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
+            logger.info(f"🔐 Autenticación MQTT configurada para usuario: {MQTT_USERNAME}")
         mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
         mqtt_client.loop_start()
     except Exception as e:
