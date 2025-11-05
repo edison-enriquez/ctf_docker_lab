@@ -589,17 +589,77 @@
             height: 100%;
             background: rgba(10, 14, 39, 0.95);
             backdrop-filter: blur(5px);
+            overflow-y: auto;
+            padding: 20px 0;
         }
 
         .modal-content {
             background: var(--bg-secondary);
-            margin: 10% auto;
+            margin: 20px auto;
             padding: 30px;
             border: 2px solid var(--border-color);
             border-radius: 12px;
             max-width: 650px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
             box-shadow: 0 0 40px rgba(0, 255, 65, 0.4);
             position: relative;
+        }
+
+        /* Estilos específicos para modal de write-up */
+        #writeupModal .modal-content {
+            max-width: 900px;
+            max-height: calc(100vh - 60px);
+        }
+
+        /* Estilos específicos para modal de quiz */
+        #quizModal .modal-content {
+            max-width: 800px;
+            max-height: calc(100vh - 60px);
+        }
+
+        /* Scrollbar personalizada para modales */
+        .modal-content::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+            border-radius: 5px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: var(--accent-green);
+            border-radius: 5px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* Área de contenido con scroll en modales */
+        #quizContent {
+            max-height: calc(100vh - 280px);
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        #quizContent::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #quizContent::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+            border-radius: 4px;
+        }
+
+        #quizContent::-webkit-scrollbar-thumb {
+            background: var(--accent-purple);
+            border-radius: 4px;
+        }
+
+        #quizContent::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
         }
 
         .close {
@@ -826,7 +886,7 @@
 
     <!-- Modal para Write-up/Taller -->
     <div id="writeupModal" class="modal">
-        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-content">
             <span class="close" onclick="closeWriteupModal()">&times;</span>
             <h2 style="color: var(--accent-green); margin-bottom: 20px;">📖 [ WRITE-UP / TALLER ]</h2>
             <div id="writeupContent" style="
@@ -834,7 +894,7 @@
                 line-height: 1.8;
                 color: var(--text-primary);
                 padding: 20px;
-                background: var(--bg-secondary);
+                background: var(--bg-tertiary);
                 border-radius: 8px;
                 border: 1px solid var(--border-color);
             "></div>
