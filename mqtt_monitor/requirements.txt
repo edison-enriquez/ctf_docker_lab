@@ -12,14 +12,8 @@ paho-mqtt>=1.6.1
 eventlet>=0.33.0
 gevent>=23.9.0
 
-# Database (choose one or use in-memory)
-# sqlite3 is built-in to Python
-
-# Optional: Redis for advanced caching
-# redis>=5.0.0
-
-# Optional: Database ORM
-# sqlalchemy>=2.0.0
+# Database - PostgreSQL
+psycopg2-binary>=2.9.9
 
 # Utilities
 python-dotenv>=1.0.0
