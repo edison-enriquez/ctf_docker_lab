@@ -91,6 +91,90 @@ def get_challenges():
     return jsonify(challenges_data)
 
 
+@app.route('/api/verify-flag', methods=['POST'])
+def verify_flag():
+    """
+    Endpoint para verificar una flag y los requisitos Docker antes de enviar
+    
+    Body JSON:
+        {
+            "flag": "FLAG{...}"
+        }
+    
+    Returns:
+        JSON con resultado de la verificación
+    """
+    data = request.get_json()
+    
+    if not data or 'flag' not in data:
+        return jsonify({
+            "success": False,
+            "message": "❌ Debes proporcionar una flag"
+        }), 400
+    
+    flag = data['flag'].strip()
+    
+    # Mapeo de retos a sus textos base de flags
+    flag_bases = {
+        1: "primer_contenedor",
+        2: "imagen_descargada",
+        3: "contenedor_background",
+        4: "puerto_mapeado",
+        5: "volumen_creado",
+        6: "red_creada",
+        7: "contenedores_conectados",
+        8: "ssh_configurado",
+        9: "telnet_activo",
+        10: "scada_desplegado",
+        11: "vnc_funcionando",
+        12: "dockerfile_creado",
+        13: "compose_desplegado",
+        14: "inspeccion_exitosa",
+        15: "limpieza_completa"
+    }
+    
+    # Buscar el reto que corresponde a esta flag
+    reto_id = None
+    reto = None
+    for r in challenge.retos:
+        flag_esperada = challenge.generar_flag_personalizada(r["id"], flag_bases[r["id"]])
+        if flag_esperada == flag:
+            reto_id = r["id"]
+            reto = r
+            break
+    
+    if not reto_id:
+        return jsonify({
+            "success": False,
+            "message": "❌ Flag incorrecta o no válida"
+        })
+    
+    # Verificar si ya fue completado
+    if reto_id in challenge.progress.get("completados", []):
+        return jsonify({
+            "success": False,
+            "message": f"⚠️  Ya completaste este reto: {reto['nombre']}"
+        })
+    
+    # Verificar requisitos Docker del reto
+    verificacion_exitosa = challenge._verificar_reto_especifico(reto_id)
+    
+    if verificacion_exitosa:
+        return jsonify({
+            "success": True,
+            "message": f"✅ Verificación Docker exitosa para: {reto['nombre']}",
+            "reto_id": reto_id,
+            "reto_nombre": reto['nombre']
+        })
+    else:
+        return jsonify({
+            "success": False,
+            "message": f"⚠️  Flag correcta, pero no se detectó la ejecución del comando Docker. Asegúrate de ejecutar el comando requerido para: {reto['nombre']}",
+            "reto_id": reto_id,
+            "reto_nombre": reto['nombre']
+        })
+
+
 @app.route('/api/submit', methods=['POST'])
 def submit_flag():
     """
