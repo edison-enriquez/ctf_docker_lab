@@ -728,23 +728,41 @@
                 >
                 <button type="submit">EXECUTE</button>
             </form>
-            <button onclick="showQuizModal()" style="
-                margin-top: 15px;
-                padding: 12px 30px;
-                background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-cyan) 100%);
-                border: 2px solid var(--accent-purple);
-                color: white;
-                font-family: 'Fira Code', monospace;
-                font-weight: bold;
-                cursor: pointer;
-                border-radius: 5px;
-                font-size: 1em;
-                transition: all 0.3s ease;
-                box-shadow: 0 0 15px rgba(157, 78, 221, 0.3);
-            " onmouseover="this.style.boxShadow='0 0 25px rgba(157, 78, 221, 0.6)'; this.style.transform='translateY(-2px)';" 
-               onmouseout="this.style.boxShadow='0 0 15px rgba(157, 78, 221, 0.3)'; this.style.transform='translateY(0)';">
-                🚩 VER MIS FLAGS
-            </button>
+            <div style="display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap; justify-content: center;">
+                <button onclick="showQuizModal()" style="
+                    padding: 12px 30px;
+                    background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-cyan) 100%);
+                    border: 2px solid var(--accent-purple);
+                    color: white;
+                    font-family: 'Fira Code', monospace;
+                    font-weight: bold;
+                    cursor: pointer;
+                    border-radius: 5px;
+                    font-size: 1em;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 0 15px rgba(157, 78, 221, 0.3);
+                " onmouseover="this.style.boxShadow='0 0 25px rgba(157, 78, 221, 0.6)'; this.style.transform='translateY(-2px)';" 
+                   onmouseout="this.style.boxShadow='0 0 15px rgba(157, 78, 221, 0.3)'; this.style.transform='translateY(0)';">
+                    🚩 VER MIS FLAGS
+                </button>
+                
+                <button onclick="showWriteupModal()" style="
+                    padding: 12px 30px;
+                    background: linear-gradient(135deg, #00ff41 0%, #00d9ff 100%);
+                    border: 2px solid var(--accent-green);
+                    color: var(--bg-primary);
+                    font-family: 'Fira Code', monospace;
+                    font-weight: bold;
+                    cursor: pointer;
+                    border-radius: 5px;
+                    font-size: 1em;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+                " onmouseover="this.style.boxShadow='0 0 25px rgba(0, 255, 65, 0.6)'; this.style.transform='translateY(-2px)';" 
+                   onmouseout="this.style.boxShadow='0 0 15px rgba(0, 255, 65, 0.3)'; this.style.transform='translateY(0)';">
+                    📖 WRITE-UP / TALLER
+                </button>
+            </div>
             <p class="subtitle" style="margin-top: 12px;">
                 > UUID-based flags | Unique per user | Validated in real-time
             </p>
@@ -806,6 +824,24 @@
         </div>
     </div>
 
+    <!-- Modal para Write-up/Taller -->
+    <div id="writeupModal" class="modal">
+        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <span class="close" onclick="closeWriteupModal()">&times;</span>
+            <h2 style="color: var(--accent-green); margin-bottom: 20px;">📖 [ WRITE-UP / TALLER ]</h2>
+            <div id="writeupContent" style="
+                text-align: left;
+                line-height: 1.8;
+                color: var(--text-primary);
+                padding: 20px;
+                background: var(--bg-secondary);
+                border-radius: 8px;
+                border: 1px solid var(--border-color);
+            "></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         // Matrix Rain Effect
         const canvas = document.getElementById('matrix-bg');
@@ -1340,6 +1376,106 @@
             document.getElementById('flagsModal').style.display = 'none';
         }
 
+        // ==================== FUNCIONES WRITE-UP ====================
+        
+        async function showWriteupModal() {
+            const modal = document.getElementById('writeupModal');
+            const content = document.getElementById('writeupContent');
+            
+            // Mostrar modal con loading
+            modal.style.display = 'block';
+            content.innerHTML = '<p style="text-align: center; color: var(--accent-cyan);"><span style="font-size: 2em;">⏳</span><br>Cargando write-up...</p>';
+            
+            try {
+                const response = await fetch('/api/writeup');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Convertir Markdown a HTML usando marked.js
+                    const htmlContent = marked.parse(data.content);
+                    
+                    // Aplicar estilos al contenido HTML
+                    content.innerHTML = `
+                        <div style="
+                            font-family: 'Fira Code', monospace;
+                            font-size: 0.95em;
+                        ">
+                            ${htmlContent}
+                        </div>
+                    `;
+                    
+                    // Aplicar estilos adicionales a elementos específicos
+                    content.querySelectorAll('pre').forEach(pre => {
+                        pre.style.background = 'var(--bg-primary)';
+                        pre.style.padding = '15px';
+                        pre.style.borderRadius = '5px';
+                        pre.style.border = '1px solid var(--border-color)';
+                        pre.style.overflow = 'auto';
+                    });
+                    
+                    content.querySelectorAll('code').forEach(code => {
+                        code.style.background = 'var(--bg-primary)';
+                        code.style.padding = '2px 6px';
+                        code.style.borderRadius = '3px';
+                        code.style.color = 'var(--accent-green)';
+                    });
+                    
+                    content.querySelectorAll('h1, h2, h3').forEach(h => {
+                        h.style.color = 'var(--accent-cyan)';
+                        h.style.marginTop = '30px';
+                        h.style.marginBottom = '15px';
+                    });
+                    
+                    content.querySelectorAll('table').forEach(table => {
+                        table.style.width = '100%';
+                        table.style.borderCollapse = 'collapse';
+                        table.style.marginTop = '15px';
+                        table.style.marginBottom = '15px';
+                    });
+                    
+                    content.querySelectorAll('th, td').forEach(cell => {
+                        cell.style.border = '1px solid var(--border-color)';
+                        cell.style.padding = '10px';
+                    });
+                    
+                    content.querySelectorAll('th').forEach(th => {
+                        th.style.background = 'var(--bg-primary)';
+                        th.style.color = 'var(--accent-green)';
+                    });
+                    
+                    content.querySelectorAll('blockquote').forEach(bq => {
+                        bq.style.borderLeft = '4px solid var(--accent-green)';
+                        bq.style.paddingLeft = '15px';
+                        bq.style.marginLeft = '0';
+                        bq.style.color = 'var(--accent-cyan)';
+                    });
+                    
+                    showNotification('[ SUCCESS ] Write-up cargado correctamente', 'success');
+                } else {
+                    content.innerHTML = `
+                        <p style="color: var(--accent-red); text-align: center;">
+                            <span style="font-size: 2em;">⚠️</span><br>
+                            ${data.message}
+                        </p>
+                    `;
+                    showNotification('[ ERROR ] ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error cargando write-up:', error);
+                content.innerHTML = `
+                    <p style="color: var(--accent-red); text-align: center;">
+                        <span style="font-size: 2em;">❌</span><br>
+                        Error al cargar el write-up
+                    </p>
+                `;
+                showNotification('[ ERROR ] Error al cargar write-up', 'error');
+            }
+        }
+        
+        function closeWriteupModal() {
+            document.getElementById('writeupModal').style.display = 'none';
+        }
+
         // Cerrar modales al hacer clic fuera
         document.getElementById('quizModal').addEventListener('click', function(e) {
             if (e.target === this) {
@@ -1350,6 +1486,12 @@
         document.getElementById('flagsModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeFlagsModal();
+            }
+        });
+
+        document.getElementById('writeupModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeWriteupModal();
             }
         });
 
