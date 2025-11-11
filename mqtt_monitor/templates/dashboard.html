@@ -216,23 +216,34 @@
             fetch('/api/students')
                 .then(res => res.json())
                 .then(students => {
+                    console.log('👥 Estudiantes recibidos:', students.length);
                     renderStudents(students);
+                })
+                .catch(err => {
+                    console.error('❌ Error cargando estudiantes:', err);
                 });
             
             // Cargar estadísticas
             fetch('/api/statistics')
                 .then(res => res.json())
                 .then(stats => {
-                    document.getElementById('totalStudents').textContent = stats.total_students;
-                    document.getElementById('onlineStudents').textContent = stats.online_students;
-                    document.getElementById('avgProgress').textContent = stats.avg_progress.toFixed(1) + '%';
-                    document.getElementById('totalEvents').textContent = stats.total_events;
+                    console.log('📊 Estadísticas recibidas:', stats);
+                    document.getElementById('totalStudents').textContent = stats.total_estudiantes || 0;
+                    document.getElementById('onlineStudents').textContent = stats.estudiantes_online || 0;
+                    const avgProgress = (stats.promedio_retos / stats.total_retos_disponibles * 100) || 0;
+                    document.getElementById('avgProgress').textContent = avgProgress.toFixed(1) + '%';
+                    document.getElementById('totalEvents').textContent = stats.total_completados || 0;
+                })
+                .catch(err => {
+                    console.error('❌ Error cargando estadísticas:', err);
                 });
         }
         
         function renderStudents(students) {
             const tbody = document.querySelector('#studentsTable tbody');
             tbody.innerHTML = '';
+            
+            console.log('👥 Renderizando estudiantes:', students.length);
             
             students.forEach(student => {
                 const row = document.createElement('tr');
@@ -242,9 +253,9 @@
                 row.innerHTML = `
                     <td>${student.documento}</td>
                     <td class="${statusClass}">${statusIcon} ${student.status.toUpperCase()}</td>
-                    <td>${student.progreso_porcentaje || 0}%</td>
-                    <td>${student.puntos || 0}</td>
-                    <td>${student.completados || 0}</td>
+                    <td>${student.porcentaje_completado || 0}%</td>
+                    <td>${student.total_puntos || 0}</td>
+                    <td>${student.total_retos_completados || 0}</td>
                     <td>${formatTime(student.last_seen)}</td>
                 `;
                 
